@@ -19,6 +19,8 @@ your own copy of the game. Never add a ROM or anything extracted from one here.
 | `model/textures/` | The baked textures as PNGs (64–512 px) |
 | `model/misanthropic_cow_sm64_rig.blend` | The model fitted to Mario's 20-joint skeleton, for previews |
 | `model/misanthropic_cow_sm64_rig.json` | Her joint offsets, joint frames and scale for that rig |
+| `mod/misanthropic-cow/` | The sm64coopdx mod: her model source, textures and Lua scripts |
+| `model/misanthropic_cow_sm64_animations.json` | Her 11 animations in the game's format |
 | `renders/` | Preview renders |
 | `tools/` | The conversion scripts |
 
@@ -31,8 +33,34 @@ The full-quality original model (1.4 million triangles, 105 MB) is not stored he
 | Inspect the source model (1.4M triangles, 58 bones, 41 animations) | Done |
 | Reduce to about 20k triangles and bake clean textures (64–512 px) | Done |
 | Fit her to Mario's 20-joint skeleton with her own proportions, about 1.3× his height | Done |
-| Convert her animations to the game's format | Next |
-| Export the sm64coopdx mod (model + Lua) | To do |
+| Convert her animations to the game's format | Done |
+| Export the sm64coopdx mod (model + Lua) | Done, not yet tested in-game |
+| Test in sm64coopdx | Next |
+
+## Install the mod
+
+1. Install [sm64coopdx](https://github.com/coop-deluxe/sm64coopdx) with your own copy of the game.
+2. Copy the `mod/misanthropic-cow` folder into sm64coopdx's `mods` folder.
+3. Start sm64coopdx, open **Host**, turn on **The Misanthropic Cow** in the mod list and start the game.
+4. Type `/cow` in chat to switch her off or on.
+
+The first time the mod loads, sm64coopdx compiles her model from `actors/misanthropic_cow/` into
+a `.bin` file in the same folder, so the first start takes a little longer.
+
+### What she replaces
+
+| Her animation | Plays when the game asks for |
+|---|---|
+| Idle | standing still |
+| Walk, Run, Sneak | walking, running, tiptoeing |
+| Jump Start + Jump Rise | a single jump |
+| Fall, Land | falling, landing from a single jump |
+| Skid | skidding |
+| Hurt | the soft knockbacks |
+| Death | dying on her back, on her front or falling over |
+| Victory | collecting a star |
+
+Every other action uses Mario's animation on her body.
 
 ## Her rig
 
@@ -43,6 +71,8 @@ lengths, so Mario's animations play on her proportions. Her height is set to abo
 Mario's (about 200 game units against his 155), which is one setting in `build_rig.py`.
 Mario's animations are scaled to her leg length, so her feet stay on the ground.
 Her belly, udders, fur and tail are fixed to her torso and hips for now.
+
+![Her own animations played through the game's joint maths](renders/poses_her_animations.png)
 
 ## Tools
 
@@ -70,6 +100,13 @@ The scripts in `tools/` run with Blender 5.1 as a Python module (`pip install bp
 - `pose_test.py -- <rig.blend> <rig.json> <sm64coopdx dir> <rom> <out.png> <anim:frame:label> ...`:
   renders her in poses from Mario's animations, using the game's joint maths.
 
+- `convert_anims.py -- <cow_low.blend> <rig.json> <out.json>`: samples her animations at 30 frames
+  a second and converts them to the game's joint rotations, with her hip position on the root.
+- `export_mod.py -- <rig.blend> <rig.json> <anims.json> <out folder>`: writes the mod. Each joint gets
+  its own display list; triangles across the shoulders, elbows, wrists, hips, knees and ankles share
+  vertices the parent joint left in the renderer's vertex buffer, so those seams stretch instead of
+  tearing. It also writes `animations.lua` and `main.lua`.
+
 The ROM is only read on your machine to pose her. No data from the ROM is written to this repo.
 
 Example:
@@ -81,4 +118,6 @@ python -I tools/fix_layers.py -- work/cow_low.blend work/cow_low.blend
 python -I tools/turnaround.py -- work/cow_low.blend renders/cow_low_turnaround.png
 python -I tools/build_rig.py -- work/cow_low.blend sm64coopdx baserom.us.z64 1.3 work/cow_sm.blend work/cow_sm.json
 python -I tools/pose_test.py -- work/cow_sm.blend work/cow_sm.json sm64coopdx baserom.us.z64 renders/poses.png "anim_72:18:Running"
+python -I tools/convert_anims.py -- work/cow_low.blend work/cow_sm.json work/cow_anims.json
+python -I tools/export_mod.py -- work/cow_sm.blend work/cow_sm.json work/cow_anims.json mod/misanthropic-cow
 ```

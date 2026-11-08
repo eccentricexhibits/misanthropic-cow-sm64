@@ -1,6 +1,6 @@
 """Render the fitted model in poses from Mario's animations, using the game's joint maths.
 
-Usage: python -I pose_test.py -- <cow_sm.blend> <cow_sm.json> <coopdx dir> <rom> <out.png> <anim:frame:label> ...
+Usage: python -I pose_test.py -- <cow_sm.blend> <cow_sm.json> <coopdx dir> <rom> <out.png> [--anims her_anims.json] <anim:frame:label> ...
 Only her model is rendered; Mario's animation data is read from the ROM and not saved.
 """
 import bpy, sys, json, os, math, tempfile
@@ -10,7 +10,13 @@ from PIL import Image, ImageDraw
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import smanim as sa
 argv = sys.argv[sys.argv.index('--') + 1:]
-blend, js, coopdx, rom, out = argv[:5]; shots = [a.split(':', 2) for a in argv[5:]]
+blend, js, coopdx, rom, out = argv[:5]; rest = argv[5:]
+extra = {}
+if rest and rest[0] == '--anims':
+    for k, a in json.load(open(rest[1])).items():
+        extra[k] = sa.Anim(k, a['flags'], a['divisor'], a['start'], a['loop_start'], a['loop_end'], a['values'], a['index'])
+    rest = rest[2:]
+shots = [a.split(':', 2) for a in rest]
 bpy.ops.wm.open_mainfile(filepath=blend)
 J = json.load(open(js)); s = J['scale_units_per_m']; H = J['hip_height']
 P = np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]], float)
@@ -20,7 +26,7 @@ def to_blender(W):
         for c in range(3): M[r][c] = Rb[r, c]
         M[r][3] = t[r]
     return M
-A = sa.load_mario_anims(coopdx, rom)
+A = sa.load_mario_anims(coopdx, rom); A.update(extra)
 rig = bpy.data.objects['sm_rig']
 sc = bpy.context.scene; sc.render.engine = 'CYCLES'; sc.cycles.device = 'CPU'; sc.cycles.samples = 16; sc.cycles.use_denoising = True
 sc.render.resolution_x = 600; sc.render.resolution_y = 760
@@ -39,7 +45,7 @@ cam.location = (-r * math.sin(ang), -r * math.cos(ang), 0.95 + r * math.cos(math
 cam.rotation_euler = (math.radians(80), 0, -ang)
 tiles = []
 for name, frame, label in shots:
-    W = sa.evaluate(A[name], int(frame), J['offsets'], trans_mult=H / 189.0)
+    W = sa.evaluate(A[name], int(frame), J['offsets'], trans_mult=H / A[name].divisor)
     for n, Wj in zip(J['joints'], W): rig.pose.bones[n].matrix = to_blender(Wj)
     bpy.context.view_layer.update()
     p = os.path.join(tempfile.gettempdir(), f'pose_{name}_{frame}.png'); sc.render.filepath = p
