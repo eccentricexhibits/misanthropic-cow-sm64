@@ -1,0 +1,12 @@
+# Never commit game files: ROMs, extracted assets or built games
+*.z64
+*.n64
+*.v64
+*.rom
+baserom.*
+sm64.*.z64
+# Blender autosaves and local working files
+*.blend1
+work/
+renders/tmp/
+__pycache__/
