@@ -34,8 +34,9 @@ The full-quality original model (1.4 million triangles, 105 MB) is not stored he
 | Reduce to about 20k triangles and bake clean textures (64–512 px) | Done |
 | Fit her to Mario's 20-joint skeleton with her own proportions, about 1.3× his height | Done |
 | Convert her animations to the game's format | Done |
-| Export the sm64coopdx mod (model + Lua) | Done, not yet tested in-game |
-| Test in sm64coopdx | Next |
+| Export the sm64coopdx mod (model + Lua) | Done |
+| Test in sm64coopdx | Done: loads and plays (built on Linux, screenshots on a virtual display) |
+| Playtest on a real PC: feel, seams, height, foot sliding | Next |
 
 ## Install the mod
 
@@ -102,6 +103,8 @@ The scripts in `tools/` run with Blender 5.1 as a Python module (`pip install bp
 
 - `convert_anims.py -- <cow_low.blend> <rig.json> <out.json>`: samples her animations at 30 frames
   a second and converts them to the game's joint rotations, with her hip position on the root.
+- `ingame_test/`: runs sm64coopdx on a virtual display with a test mod that poses her for
+  screenshots (see its README).
 - `export_mod.py -- <rig.blend> <rig.json> <anims.json> <out folder>`: writes the mod. Each joint gets
   its own display list; triangles across the shoulders, elbows, wrists, hips, knees and ankles share
   vertices the parent joint left in the renderer's vertex buffer, so those seams stretch instead of
