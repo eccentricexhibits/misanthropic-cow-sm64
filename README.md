@@ -8,6 +8,20 @@ land, skid, hurt, death, victory) and Mario's for every other action.
 **This repo contains no game files.** To play, you need sm64coopdx installed with
 your own copy of the game. Never add a ROM or anything extracted from one here.
 
+![The game-ready model from the front, three-quarter, side and back](renders/turnaround_game.png)
+
+## What's in this repo
+
+| Path | What it is |
+|---|---|
+| `model/misanthropic_cow_game.glb` | The game-ready model: 19,970 triangles, with her rig, all 41 animations and baked textures |
+| `model/misanthropic_cow_game.blend` | The same model as a Blender working file |
+| `model/textures/` | The baked textures as PNGs (64–512 px) |
+| `renders/` | Preview renders |
+| `tools/` | The conversion scripts |
+
+The full-quality original model (1.4 million triangles, 105 MB) is not stored here.
+
 ## Status
 
 | Step | State |
@@ -34,6 +48,7 @@ The scripts in `tools/` run with Blender 5.1 as a Python module (`pip install bp
 - `fix_layers.py -- <in.blend> <out.blend>`: pushes outer clothing (the briefs) slightly
   outward so it doesn't cut into the layers beneath.
 - `turnaround.py -- <in.blend> <out.png>`: renders front, three-quarter, side and back views.
+- `export_glb.py -- <in.blend> <out.glb>`: exports the model, rig and animations to a glTF binary.
 
 Example:
 
