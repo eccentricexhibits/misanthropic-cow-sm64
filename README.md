@@ -19,7 +19,8 @@ your own copy of the game. Never add a ROM or anything extracted from one here.
 | `model/textures/` | The baked textures as PNGs (64–512 px) |
 | `model/misanthropic_cow_sm64_rig.blend` | The model fitted to Mario's 20-joint skeleton, for previews |
 | `model/misanthropic_cow_sm64_rig.json` | Her joint offsets, joint frames and scale for that rig |
-| `mod/misanthropic-cow/` | The sm64coopdx mod: her model source, textures and Lua scripts |
+| `mod/misanthropic-cow/` | The sm64coopdx mod: her compiled model and Lua scripts, ready to install |
+| `mod_source/actors/misanthropic_cow/` | Her model as source (`geo.inc.c`, `model.inc.c`, textures), for rebuilding the compiled model |
 | `model/misanthropic_cow_sm64_animations.json` | Her 11 animations in the game's format |
 | `renders/` | Preview renders |
 | `tools/` | The conversion scripts |
@@ -41,12 +42,15 @@ The full-quality original model (1.4 million triangles, 105 MB) is not stored he
 ## Install the mod
 
 1. Install [sm64coopdx](https://github.com/coop-deluxe/sm64coopdx) with your own copy of the game.
-2. Copy the `mod/misanthropic-cow` folder into sm64coopdx's `mods` folder.
+2. Copy the `mod/misanthropic-cow` folder into sm64coopdx's `mods` folder. If you installed an
+   earlier version, delete its folder first.
 3. Start sm64coopdx, open **Host**, turn on **The Misanthropic Cow** in the mod list and start the game.
 4. Type `/cow` in chat to switch her off or on.
 
-The first time the mod loads, sm64coopdx compiles her model from `actors/misanthropic_cow/` into
-a `.bin` file in the same folder, so the first start takes a little longer.
+Her model ships compiled (`actors/misanthropic_cow_geo.bin`, built with sm64coopdx v1.5.1), so the
+game loads it straight away. To rebuild it after changing the model, put the
+`mod_source/actors/misanthropic_cow` folder into the mod's `actors` folder, delete the old `.bin`
+and start the game once: sm64coopdx compiles it, which can take several minutes.
 
 ### What she replaces
 
@@ -123,4 +127,5 @@ python -I tools/build_rig.py -- work/cow_low.blend sm64coopdx baserom.us.z64 1.3
 python -I tools/pose_test.py -- work/cow_sm.blend work/cow_sm.json sm64coopdx baserom.us.z64 renders/poses.png "anim_72:18:Running"
 python -I tools/convert_anims.py -- work/cow_low.blend work/cow_sm.json work/cow_anims.json
 python -I tools/export_mod.py -- work/cow_sm.blend work/cow_sm.json work/cow_anims.json mod/misanthropic-cow
+# then compile the model once in sm64coopdx (see Install the mod) and keep only the .bin in mod/
 ```
